@@ -9,6 +9,7 @@ public class Main {
     static int capacidad;//capacidad del servidor
     static int cant_Nodos; //cantidad de nodos en el txt
     private static ArrayList<Nodo> Nodos = new ArrayList<Nodo>();//array de nodos del txt
+    private static ArrayList<Servidor> servidor = new ArrayList<Servidor>();//array de nodos del txt
 
     private static ArrayList<ArrayList<Integer>>  soluciones = new ArrayList<ArrayList<Integer>> ();
     //array de soluciones
@@ -104,5 +105,8 @@ public class Main {
             }
         }
         return true;
+    }
+    public static void Servidores(){
+
     }
 }
