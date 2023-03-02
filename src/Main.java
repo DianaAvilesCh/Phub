@@ -1,7 +1,8 @@
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,6 +12,7 @@ public class Main {
     static int capacidad;//capacidad del servidor
     static int cant_Nodos; //cantidad de nodos en el txt
     static int cantidad_combinaciones = 0;
+
     private static ArrayList<Nodo> Nodos = new ArrayList<Nodo>();//array de nodos del txt
     private static ArrayList<ArrayList<Nodo>> servidor = new ArrayList<ArrayList<Nodo>>();//array de nodos del txt
     private static ArrayList<ArrayList<Cliente>> clientes = new ArrayList<ArrayList<Cliente>>();//array de nodos del txt
@@ -25,35 +27,35 @@ public class Main {
 
     //Cargar datos de una ruta especifica de txt, convierte esos datos a un array
     //los guarda en la clase Nodo
-    public static void cargarDatos(){
+    public static void cargarDatos() {
         List<String> Datos = new ArrayList<>();
         int[][] nodosM = new int[0][];
         JFileChooser fc = new JFileChooser();
-        fc.showOpenDialog(fc);
+        //fc.showOpenDialog(fc);
         try {
-            File file = new File(fc.getSelectedFile().getAbsolutePath());
+            //File file = new File(fc.getSelectedFile().getAbsolutePath());
 
-        //Scanner Filast = new Scanner(new File("C:\\Users\\Criss\\Downloads\\Phub ejemplos\\phub_50_5_1.txt"));
-        Scanner Filast = new Scanner(file);
-        int n = 0;
-        while (Filast.hasNext()) {
-            //if para extraer los 3 primeros datos con info del txt
-            if (n < 3) {
-                Datos.add(Filast.next());
-                n++;
-            } else {
-                cant_Nodos = Integer.parseInt(Datos.get(0));
-                Hubs = Integer.parseInt(Datos.get(1));
-                capacidad = Integer.parseInt(Datos.get(2));
-                //guarda los nodos en una matriz
-                nodosM = new int[cant_Nodos][4];//
-                for (int i = 0; i < cant_Nodos; i++) {
-                    for (int j = 0; j < 4; j++) {
-                        nodosM[i][j] = Integer.parseInt(Filast.next());
+            Scanner Filast = new Scanner(new File("C:\\Users\\Criss\\Downloads\\Phub ejemplos\\phub_50_5_1.txt"));
+            //Scanner Filast = new Scanner(file);
+            int n = 0;
+            while (Filast.hasNext()) {
+                //if para extraer los 3 primeros datos con info del txt
+                if (n < 3) {
+                    Datos.add(Filast.next());
+                    n++;
+                } else {
+                    cant_Nodos = Integer.parseInt(Datos.get(0));
+                    Hubs = Integer.parseInt(Datos.get(1));
+                    capacidad = Integer.parseInt(Datos.get(2));
+                    //guarda los nodos en una matriz
+                    nodosM = new int[cant_Nodos][4];//
+                    for (int i = 0; i < cant_Nodos; i++) {
+                        for (int j = 0; j < 4; j++) {
+                            nodosM[i][j] = Integer.parseInt(Filast.next());
+                        }
                     }
                 }
             }
-        }
 
         } catch (NullPointerException e) {
             System.out.println("No se ha seleccionado ningún fichero");
@@ -74,7 +76,7 @@ public class Main {
     //crear diferentes combinaciones de los nodos
     public static void permutaciones() {
         int j = 0;
-
+        System.out.println("Por favor ingrese la catidad de combinaciones:");
         Scanner teclado = new Scanner(System.in);
         cantidad_combinaciones = Integer.parseInt(teclado.nextLine());
         while (j < cantidad_combinaciones) {
@@ -148,7 +150,7 @@ public class Main {
                         v += value.getNodo().getDemanda();//14
                     }
 
-                v+=Nodos.get(index - 1).getDemanda();//114+14=128
+                v += Nodos.get(index - 1).getDemanda();//114+14=128
                 if (v <= 120) {
                     //agrego el cliente a la lista
                     Cliente cliente = new Cliente(nodo, (r));
@@ -167,17 +169,17 @@ public class Main {
     }
 
     public static void distancia() {
-        int menor = 0;
+        double menor = 0;
         int contador = 0;
         for (int l = 0; l < cantidad_combinaciones; l++) {
-            int sumC = 0;
+            double sumC = 0;
             for (int lo = 0; lo < Hubs; lo++) {
-                int suma = 0;
+                double suma = 0;
                 int xs = servidor.get(l).get(lo).getCoordenada_x();
                 int ys = servidor.get(l).get(lo).getCoordenada_y();
 
                 for (int lox = 0; lox < clientes.get(l).size(); lox++) {
-                    if((lo+1) == clientes.get(l).get(lox).getServidor()){
+                    if ((lo + 1) == clientes.get(l).get(lox).getServidor()) {
                         int xc = clientes.get(l).get(lox).getNodo().getCoordenada_x();
                         int yc = clientes.get(l).get(lox).getNodo().getCoordenada_y();
                         double val = Math.sqrt(Math.pow((xc - xs), 2) + Math.pow((yc - ys), 2));
@@ -193,19 +195,39 @@ public class Main {
                 contador = l;
             }
         }
-        System.out.println("MEJOR DISTANCIA --: " + menor);
-        System.out.println("COMBINACIÓN " + (contador + 1));
+
+        resultado(menor, contador);
+    }
+
+    public static void resultado(double menor, int contador) {
+        //Formato para redondear decimales
+        DecimalFormatSymbols separadoresPersonalizados = new DecimalFormatSymbols();
+        separadoresPersonalizados.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("#.00", separadoresPersonalizados);
+
+        System.out.println("MEJOR DISTANCIA: " + df.format(menor));
+        System.out.println("COMBINACIÓN: " + (contador + 1));
+
         for (int n = 0; n < Hubs; n++) {
+            double disServ = 0;
             System.out.println("SERVIDOR: " + servidor.get(contador).get(n).getId());
             System.out.print("CLIENTES:");
+            int xs = servidor.get(contador).get(n).getCoordenada_x();
+            int ys = servidor.get(contador).get(n).getCoordenada_y();
             for (int g = 0; g < clientes.get(contador).size(); g++) {
-                if(clientes.get(contador).get(g).getServidor() == (n+1))
+                if (clientes.get(contador).get(g).getServidor() == (n + 1)) {
                     System.out.print(" " + clientes.get(contador).get(g).getNodo().getId() + " - ");
+                    int xc = clientes.get(contador).get(g).getNodo().getCoordenada_x();
+                    int yc = clientes.get(contador).get(g).getNodo().getCoordenada_y();
+                    double val = Math.sqrt(Math.pow((xc - xs), 2) + Math.pow((yc - ys), 2));
+                    disServ += val;
+                }
             }
             System.out.println();
+
+            System.out.println("SUMA DE DISTANCIA DEL SERVIDOR: " + df.format(disServ));
             System.out.println();
         }
-
     }
 
     //VALIDAR QUE NO SE REPITAN DATOS EN LOS ARRAYS
@@ -227,15 +249,4 @@ public class Main {
         return true;
     }
 
-        /*for(int l = 0 ; l<cantidad_combinaciones;l++){
-            System.out.println("COMB: "+l);
-            for(int lo = 0 ; lo<5;lo++){
-                System.out.println("SERV: "+lo);
-                System.out.println("ID: "+servidor.get(l).get(lo).getId());
-                System.out.println("x: "+servidor.get(l).get(lo).getCoordenada_x());
-                System.out.println("y: "+servidor.get(l).get(lo).getCoordenada_y());
-                System.out.println("Demand: "+servidor.get(l).get(lo).getDemanda());
-
-            }
-        }*/
 }
