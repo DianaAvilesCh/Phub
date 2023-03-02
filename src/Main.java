@@ -12,12 +12,12 @@ public class Main {
     static int capacidad;//capacidad del servidor
     static int cant_Nodos; //cantidad de nodos en el txt
     static int cantidad_combinaciones = 0;
-
     private static ArrayList<Nodo> Nodos = new ArrayList<Nodo>();//array de nodos del txt
+    //[[cliente1, cliente 2, nodo3, nodo4,nodo5]](nodo1, s1)
     private static ArrayList<ArrayList<Nodo>> servidor = new ArrayList<ArrayList<Nodo>>();//array de nodos del txt
     private static ArrayList<ArrayList<Cliente>> clientes = new ArrayList<ArrayList<Cliente>>();//array de nodos del txt
     private static ArrayList<ArrayList<Integer>> soluciones = new ArrayList<ArrayList<Integer>>();
-
+    //[[2,3,4,5,8][4,5,2,7,8]]
     //array de soluciones
     public static void main(String[] args) throws FileNotFoundException {
         cargarDatos();
@@ -28,11 +28,14 @@ public class Main {
     //Cargar datos de una ruta especifica de txt, convierte esos datos a un array
     //los guarda en la clase Nodo
     public static void cargarDatos() {
+        //info del servidor (cantidad de nodos, servidores, capacidad)
         List<String> Datos = new ArrayList<>();
         int[][] nodosM = new int[0][];
+        //cargar los datos desde el explorador de archivos
         JFileChooser fc = new JFileChooser();
         fc.showOpenDialog(fc);
         try {
+            //obtener URL PATH al seleccionar carpeta
             File file = new File(fc.getSelectedFile().getAbsolutePath());
 
             //Scanner Filast = new Scanner(new File("C:\\Users\\Criss\\Downloads\\Phub ejemplos\\phub_50_5_1.txt"));
@@ -43,10 +46,8 @@ public class Main {
                 if (n < 3) {
                     Datos.add(Filast.next());
                     n++;
-                } else {
                     cant_Nodos = Integer.parseInt(Datos.get(0));
-                    Hubs = Integer.parseInt(Datos.get(1));
-                    capacidad = Integer.parseInt(Datos.get(2));
+                } else {
                     //guarda los nodos en una matriz
                     nodosM = new int[cant_Nodos][4];//
                     for (int i = 0; i < cant_Nodos; i++) {
@@ -56,6 +57,8 @@ public class Main {
                     }
                 }
             }
+            Hubs = Integer.parseInt(Datos.get(1));
+            capacidad = Integer.parseInt(Datos.get(2));
 
         } catch (NullPointerException e) {
             System.out.println("No se ha seleccionado ningún fichero");
@@ -75,17 +78,18 @@ public class Main {
 
     //crear diferentes combinaciones de los nodos
     public static void permutaciones() {
-        int j = 0;
         System.out.println("Por favor ingrese la catidad de combinaciones:");
         Scanner teclado = new Scanner(System.in);
         cantidad_combinaciones = Integer.parseInt(teclado.nextLine());
+
+        int j = 0;
         while (j < cantidad_combinaciones) {
             int x = 0;
             ArrayList<Integer> lista = new ArrayList<>();
             while (x < cant_Nodos) {
-                int r = (int) (Math.random() * cant_Nodos + 1);
+                int r = (int) (Math.random() * cant_Nodos + 1);//2
                 if (validarCombUni(r, lista)) {
-                    lista.add(r);
+                    lista.add(r);//
                     x++;
                 }
             }
@@ -98,14 +102,14 @@ public class Main {
     }
 
     public static void Servidores() {
-        int j = 0;
+        int j = 0;//[[5servidores][][][][][]]
         while (j < cantidad_combinaciones) {
             int x = 0;
             int cantidad = cant_Nodos;
             ArrayList<Nodo> lista = new ArrayList<>();
             while (x < Hubs) {
                 //r me da la posición del valor que sera mi servidor
-                int r = (int) (Math.random() * cantidad + 1);
+                int r = (int) (Math.random() * cantidad + 1);//[2][1,6,4]
                 //index me devuelve el valor que se encuentra en la posicion r
                 int index = soluciones.get(j).get(r - 1);
                 //cargo los valores del nodo con el id de index en la clase
@@ -128,15 +132,16 @@ public class Main {
     public static void Clientes() {
         int j = 0;
         while (j < cantidad_combinaciones) {
-            int cantidad = cant_Nodos - Hubs;
+            int cantidad = cant_Nodos - Hubs;//44
 
             //arrays que guardar nodos por cliente
             ArrayList<Cliente> lista = new ArrayList<Cliente>();
             while (cantidad > 0) {
-                int v = 0;
+                int v = 0;//demanda
                 //r me da la posición del del servidor [45,20,75,11,8]
-                int r = (int) (Math.random() * Hubs + 1);//2 [20] //1 [45]// 2
+                int r = (int) (Math.random() * Hubs + 1);//[5,3,6,7,2]3
 
+                //[[2,4][3,5,6][]]
                 //index me devuelve el valor que se encuentra en la posicion soluciones[[4],[5,7,8]]
                 int index = soluciones.get(j).get(0);
 
@@ -145,13 +150,13 @@ public class Main {
                         Nodos.get(index - 1).getCoordenada_y(), Nodos.get(index - 1).getDemanda());
 
                 //conseguir la demanda total que tiene el servidor
-                for (Cliente value : lista)//[(c1:2,s:2)][c2:3,s:1][][][
+                for (Cliente value : lista)//[cl:5,sr:6]
                     if ((r) == value.getServidor()) {
-                        v += value.getNodo().getDemanda();//14
+                        v += value.getNodo().getDemanda();//119
                     }
-
-                v += Nodos.get(index - 1).getDemanda();//114+14=128
-                if (v <= 120) {
+//v
+                v += Nodos.get(index - 1).getDemanda();//14
+                if (v <= capacidad) {
                     //agrego el cliente a la lista
                     Cliente cliente = new Cliente(nodo, (r));
                     lista.add(cliente);//[(c1,sx), (c2,sx)]
@@ -161,7 +166,7 @@ public class Main {
                 }
 
             }
-            clientes.add(lista);
+            clientes.add(lista);//[[3:6,2:3,4:5][5:28]
             j++;
 
         }
@@ -170,15 +175,15 @@ public class Main {
 
     public static void distancia() {
         double menor = 0;
-        int contador = 0;
-        for (int l = 0; l < cantidad_combinaciones; l++) {
+        int combinacion = 0;
+        for (int l = 0; l < cantidad_combinaciones; l++) {//0
             double sumC = 0;
-            for (int lo = 0; lo < Hubs; lo++) {
+            for (int lo = 0; lo < Hubs; lo++) { //0 [5,3,7,9,8]
                 double suma = 0;
-                int xs = servidor.get(l).get(lo).getCoordenada_x();
+                int xs = servidor.get(l).get(lo).getCoordenada_x();//
                 int ys = servidor.get(l).get(lo).getCoordenada_y();
 
-                for (int lox = 0; lox < clientes.get(l).size(); lox++) {
+                for (int lox = 0; lox < clientes.get(l).size(); lox++) {//[[cl1:s3],[cl2:s1]]
                     if ((lo + 1) == clientes.get(l).get(lox).getServidor()) {
                         int xc = clientes.get(l).get(lox).getNodo().getCoordenada_x();
                         int yc = clientes.get(l).get(lox).getNodo().getCoordenada_y();
@@ -186,17 +191,17 @@ public class Main {
                         suma += val;
                     }
                 }
-                sumC += suma;
+                sumC += suma;//2500-1700
             }
             if (l == 0)
                 menor = sumC;
             if (menor > sumC) {
                 menor = sumC;
-                contador = l;
+                combinacion = l;
             }
         }
 
-        resultado(menor, contador);
+        resultado(menor, combinacion);
     }
 
     public static void resultado(double menor, int contador) {
@@ -232,7 +237,7 @@ public class Main {
 
     //VALIDAR QUE NO SE REPITAN DATOS EN LOS ARRAYS
     public static boolean validarCombUni(int x, ArrayList<Integer> lista) {
-        for (int nodo : lista) {
+        for (int nodo : lista) { //x=4 lista=[1,5,7,4]
             if (x == nodo) {
                 return false;
             }
@@ -242,7 +247,7 @@ public class Main {
 
     public static boolean validarCombUniPer(ArrayList<Integer> x, ArrayList<ArrayList<Integer>> lista) {
         for (ArrayList<Integer> nodo : lista) {
-            if (x == nodo) {
+            if (x == nodo) { //lista x= [2,4,5,7] lista listax= [[2,4,5,7],[4,8,7,9]]
                 return false;
             }
         }
