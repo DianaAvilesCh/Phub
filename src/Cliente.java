@@ -1,9 +1,28 @@
 public class Cliente {
-    private int nodo;
-    private int distancia_servidor;
+    private Nodo nodo;
+    private int servidor;
 
-    public Cliente(int nodo, int distancia_servidor) {
+    public Cliente() {
+    }
+
+    public Nodo getNodo() {
+        return nodo;
+    }
+
+    public void setNodo(Nodo nodo) {
         this.nodo = nodo;
-        this.distancia_servidor = distancia_servidor;
+    }
+
+    public int getServidor() {
+        return servidor;
+    }
+
+    public void setServidor(int servidor) {
+        this.servidor = servidor;
+    }
+
+    public Cliente(Nodo nodo, int servidor) {
+        this.nodo = nodo;
+        this.servidor = servidor;
     }
 }
