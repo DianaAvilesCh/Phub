@@ -31,12 +31,12 @@ public class Main {
         List<String> Datos = new ArrayList<>();
         int[][] nodosM = new int[0][];
         JFileChooser fc = new JFileChooser();
-        //fc.showOpenDialog(fc);
+        fc.showOpenDialog(fc);
         try {
-            //File file = new File(fc.getSelectedFile().getAbsolutePath());
+            File file = new File(fc.getSelectedFile().getAbsolutePath());
 
-            Scanner Filast = new Scanner(new File("C:\\Users\\Criss\\Downloads\\Phub ejemplos\\phub_50_5_1.txt"));
-            //Scanner Filast = new Scanner(file);
+            //Scanner Filast = new Scanner(new File("C:\\Users\\Criss\\Downloads\\Phub ejemplos\\phub_50_5_1.txt"));
+            Scanner Filast = new Scanner(file);
             int n = 0;
             while (Filast.hasNext()) {
                 //if para extraer los 3 primeros datos con info del txt
